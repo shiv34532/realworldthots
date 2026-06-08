@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>RealWorld Thots | Modern Blog with Community Reviews</title>
+  <!-- Tailwind CSS + Google Fonts + Font Awesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Custom tweaks -->
+  <style>
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    body { background: #fefaf5; }
+    .card-hover { transition: all 0.25s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 25px 35px -12px rgba(0, 0, 0, 0.15); }
+    .modal-transition { animation: fadeSlideUp 0.25s ease-out; }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .rating-star { cursor: pointer; transition: color 0.1s; }
+    .rating-star:hover { transform: scale(1.1); }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .active-filter { background-color: #cb6e3e; color: white !important; border-color: #cb6e3e !important; }
+  </style>
+</head>
+<body class="scroll-smooth">
+
+  <!-- ====================== HEADER WITH LOGO & NAVBAR ====================== -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-amber-100">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <!-- Logo section -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-600 to-orange-500 flex items-center justify-center shadow-md">
+          <span class="text-white font-extrabold text-xl">RWT</span>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-stone-800 to-amber-700 bg-clip-text text-transparent">realworld<span class="text-amber-600">thots</span></h1>
+          <p class="text-[11px] text-stone-500 -mt-1">unfiltered · authentic stories</p>
+        </div>
+      </div>
+      <!-- Navbar (filter categories) -->
+      <nav class="flex flex-wrap gap-2 text-sm font-medium" id="navbarFilters">
+        <button data-filter="all" class="filter-btn px-4 py-2 rounded-full bg-amber-50 text-stone-700 border border-amber-200 hover:bg-amber-100 transition">🏠 Home</button>
+        <button data-filter="mindset" class="filter-btn px-4 py-2 rounded-full bg-amber-50 text-stone-700 border border-amber-200 hover:bg-amber-100 transition">🧠 Mindset</button>
+        <button data-filter="wellness" class="filter-btn px-4 py-2 rounded-full bg-amber-50 text-stone-700 border border-amber-200 hover:bg-amber-100 transition">🌿 Wellness</button>
+        <button data-filter="relationships" class="filter-btn px-4 py-2 rounded-full bg-amber-50 text-stone-700 border border-amber-200 hover:bg-amber-100 transition">💬 Relationships</button>
+        <button data-filter="perspective" class="filter-btn px-4 py-2 rounded-full bg-amber-50 text-stone-700 border border-amber-200 hover:bg-amber-100 transition">👁️ Perspective</button>
+        <button data-filter="culture" class="filter-btn px-4 py-2 rounded-full bg-amber-50 text-stone-700 border border-amber-200 hover:bg-amber-100 transition">🌍 Culture</button>
+        <button data-filter="self-love" class="filter-btn px-4 py-2 rounded-full bg-amber-50 text-stone-700 border border-amber-200 hover:bg-amber-100 transition">💖 Self-love</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative bg-gradient-to-br from-amber-50 via-orange-50 to-white py-16 md:py-24 overflow-hidden">
+    <div class="absolute right-0 top-0 w-80 h-80 bg-amber-200 rounded-full blur-3xl opacity-30"></div>
+    <div class="max-w-6xl mx-auto px-5 text-center relative z-10">
+      <div class="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm px-4 py-1 rounded-full text-amber-700 text-sm font-medium border border-amber-200 mb-5">
+        <i class="fas fa-globe-americas"></i> real world · real voices
+      </div>
+      <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight text-stone-800 max-w-3xl mx-auto leading-tight">thoughts that <span class="bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent">actually matter</span></h2>
+      <p class="text-stone-600 text-lg max-w-2xl mx-auto mt-5">Raw, honest reflections on growth, work, love & modern life. Join thousands of readers.</p>
+    </div>
+  </section>
+
+  <!-- BLOG GRID SECTION -->
+  <main class="max-w-7xl mx-auto px-5 py-12">
+    <div class="flex justify-between items-center mb-8 flex-wrap gap-3">
+      <h3 class="text-2xl font-bold text-stone-800 border-l-4 border-amber-500 pl-4">🔥 fresh perspectives</h3>
+      <div class="text-sm text-stone-500 bg-amber-50 px-3 py-1 rounded-full"><i class="fas fa-comment-dots mr-1"></i> <span id="totalCommentsCount">0</span> community reviews</div>
+    </div>
+    <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+  </main>
+
+  <!-- MODAL FOR FULL BLOG + COMMENT/REVIEW + SHARE SECTION -->
+  <div id="blogModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-all overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl modal-transition">
+      <div class="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-amber-100 px-6 py-4 flex justify-between items-center">
+        <h3 id="modalTitle" class="text-2xl font-bold text-stone-800 pr-8">Blog Title</h3>
+        <button id="closeModalBtn" class="text-3xl text-stone-400 hover:text-amber-600 transition">&times;</button>
+      </div>
+      <div class="p-6 md:p-8">
+        <!-- Full content -->
+        <div id="modalFullContent" class="prose prose-amber max-w-none text-stone-700 leading-relaxed"></div>
+        
+        <!-- SHARE SECTION (each blog) -->
+        <div class="mt-8 pt-6 border-t border-amber-100">
+          <p class="font-semibold text-stone-700 flex items-center gap-2"><i class="fas fa-share-alt text-amber-600"></i> Share this thot</p>
+          <div class="flex flex-wrap gap-3 mt-3" id="shareButtons">
+            <a href="#" target="_blank" id="shareTwitter" class="bg-sky-50 hover:bg-sky-100 text-sky-700 px-4 py-2 rounded-full text-sm flex items-center gap-2 transition"><i class="fab fa-twitter"></i> Twitter</a>
+            <a href="#" target="_blank" id="shareFacebook" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full text-sm flex items-center gap-2 transition"><i class="fab fa-facebook-f"></i> Facebook</a>
+            <a href="#" target="_blank" id="shareLinkedin" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm flex items-center gap-2 transition"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+            <button id="copyLinkBtn" class="bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-full text-sm flex items-center gap-2 transition"><i class="fas fa-link"></i> Copy link</button>
+          </div>
+        </div>
+        
+        <!-- COMMENT & REVIEW SECTION (each blog specific) -->
+        <div class="mt-10 bg-amber-50/40 rounded-2xl p-6 border border-amber-100">
+          <h4 class="text-xl font-bold flex items-center gap-2 text-stone-800"><i class="fas fa-star text-amber-500"></i> Community reviews & ratings</h4>
+          <div id="reviewsContainer" class="mt-5 max-h-64 overflow-y-auto space-y-4 pr-2"></div>
+          <div class="mt-6 bg-white p-5 rounded-xl shadow-sm">
+            <p class="font-semibold mb-3">✍️ Write your review</p>
+            <input type="text" id="reviewerName" placeholder="Your name" class="w-full border border-amber-200 rounded-xl px-4 py-2 mb-3 focus:ring-2 focus:ring-amber-300 outline-none">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-sm font-medium">Rating:</span>
+              <div id="ratingStars" class="flex gap-1 text-2xl text-amber-400">
+                <i class="far fa-star rating-star" data-rating="1"></i>
+                <i class="far fa-star rating-star" data-rating="2"></i>
+                <i class="far fa-star rating-star" data-rating="3"></i>
+                <i class="far fa-star rating-star" data-rating="4"></i>
+                <i class="far fa-star rating-star" data-rating="5"></i>
+              </div>
+              <span id="selectedRatingVal" class="text-sm text-stone-500 ml-2">0/5</span>
+            </div>
+            <textarea id="reviewComment" rows="2" placeholder="What's your honest thought? Share your experience..." class="w-full border border-amber-200 rounded-xl px-4 py-2 focus:ring-2 focus:ring-amber-300"></textarea>
+            <button id="submitReviewBtn" class="mt-3 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-5 rounded-full transition shadow-sm">Post review</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======================= BLOG DATA WITH REAL WORLD ATTRACTIVE PHOTOS (Unsplash) =======================
+    const blogPosts = [
+      { id: 1, title: "The productivity trap is real — here's what helped me", excerpt: "Stop glorifying burnout. Embrace slow progress.", fullContent: "We've been sold the idea that every minute must be optimized. But real life is messy. I tried 5 AM routines, notion dashboards, and time-blocking everything. The result? Anxiety and guilt. What actually works: intentional rest, focusing on 3 meaningful tasks, and honoring your natural rhythm. True productivity feels light, not heavy. Start by asking: 'What matters today?' not 'what can I squeeze in?'", tag: "mindset", image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&h=400&fit=crop", alt: "person stressed with papers" },
+      { id: 2, title: "Digital minimalism for the distracted soul", excerpt: "Reclaim attention, reduce anxiety, and feel creative again.", fullContent: "Two hours of scrolling felt like 'relaxing' until I realized I was more drained than before. The shift: app timers, grayscale screen, and intentional offline mornings. Creativity bloomed when boredom returned. We're not meant to consume 24/7 — we're meant to create, connect, breathe. Take one digital sunset per week.", tag: "wellness", image: "https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?w=600&h=400&fit=crop", alt: "woman disconnecting" },
+      { id: 3, title: "Hard conversations: how to speak your truth kindly", excerpt: "Communication skills that preserve relationships.", fullContent: "Avoiding hard talks only builds walls. But honesty without compassion is brutality. The formula: state your feelings using 'I' statements, validate their perspective, and request a small change. Example: 'I feel overlooked when meetings run late. I know you're busy too, could we set a 5-min warning?' Small shifts, huge peace.", tag: "relationships", image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&h=400&fit=crop", alt: "couple talking" },
+      { id: 4, title: "Why your 20s don't have to be 'hustle decade'", excerpt: "Challenging the grind culture mindset.", fullContent: "Social media glorifies 20-something millionaires, but most growth happens quietly. My 20s gave me debt, confusion, and a few beautiful friendships. Not a startup. And that's okay. The pressure to have it all figured out is a lie. Build skills, yes. But also travel, cry, laugh, learn what you hate.", tag: "perspective", image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop", alt: "friends laughing" },
+      { id: 5, title: "Modern loneliness & how we can reconnect", excerpt: "Small acts of offline community heal.", fullContent: "We have hundreds of followers but no one to call when we're sad. The fix isn't deleting social media, it's curating real interactions. Weekly dinner with friends, joining a walking club, even talking to a neighbor. Vulnerability is the shortcut. Tell someone 'I've been struggling' — magic happens.", tag: "culture", image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=400&fit=crop", alt: "friends walking" },
+      { id: 6, title: "Letting go of the 'perfect life' fantasy", excerpt: "Stop comparing, start living authentically.", fullContent: "The comparison game is a joy thief. Everyone posts wins, rarely the struggle. I unfollowed accounts that triggered inadequacy and started a gratitude journal for small things. Today, I celebrate average days. No one has a perfect life — only real ones, with cracks and light. Your authentic story is enough.", tag: "self-love", image: "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=600&h=400&fit=crop", alt: "woman smiling journal" }
+    ];
+
+    // ======================= LOCALSTORAGE FOR REVIEWS (per post) =======================
+    function loadReviews(postId) {
+      const key = `blogReviews_${postId}`;
+      const stored = localStorage.getItem(key);
+      if (stored) return JSON.parse(stored);
+      // default sample reviews
+      const defaultReviews = [
+        { name: "Maya Chen", rating: 5, comment: "This really resonated. I’ve been stuck in hustle culture, time to shift.", date: new Date().toLocaleDateString() },
+        { name: "Alex Rivera", rating: 4, comment: "Excellent perspective! Would love more actionable tips.", date: new Date().toLocaleDateString() }
+      ];
+      localStorage.setItem(key, JSON.stringify(defaultReviews));
+      return defaultReviews;
+    }
+
+    function saveReviews(postId, reviews) {
+      localStorage.setItem(`blogReviews_${postId}`, JSON.stringify(reviews));
+    }
+
+    function addReview(postId, name, rating, comment) {
+      if (!name.trim()) name = "Anonymous reader";
+      const reviews = loadReviews(postId);
+      reviews.unshift({ name: name.trim(), rating: rating, comment: comment.trim(), date: new Date().toLocaleString() });
+      saveReviews(postId, reviews);
+      return reviews;
+    }
+
+    // render reviews inside modal for current post
+    let currentModalPostId = null;
+    let currentRatingSelected = 0;
+
+    function renderReviews(postId) {
+      const reviews = loadReviews(postId);
+      const container = document.getElementById('reviewsContainer');
+      if (!container) return;
+      if (reviews.length === 0) {
+        container.innerHTML = `<div class="text-stone-400 text-center py-4">No reviews yet. Be the first to share your thought!</div>`;
+        return;
+      }
+      container.innerHTML = reviews.map(rev => `
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-amber-50">
+          <div class="flex justify-between items-start">
+            <div><span class="font-bold text-stone-800">${escapeHtml(rev.name)}</span> 
+              <span class="text-yellow-500 text-sm ml-2">${'★'.repeat(rev.rating)}${'☆'.repeat(5-rev.rating)}</span>
+            </div>
+            <span class="text-xs text-stone-400">${rev.date}</span>
+          </div>
+          <p class="text-stone-600 mt-2 text-sm">${escapeHtml(rev.comment)}</p>
+        </div>
+      `).join('');
+      // update global comment count
+      const totalComments = document.querySelectorAll('#reviewsContainer > div').length;
+      document.getElementById('totalCommentsCount').innerText = totalComments;
+    }
+
+    // Helper
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
+
+    // ======================= RENDER BLOG CARDS WITH FILTER =======================
+    let activeFilter = "all";
+
+    function renderBlogs() {
+      const grid = document.getElementById('blogGrid');
+      const filtered = activeFilter === "all" ? blogPosts : blogPosts.filter(post => post.tag === activeFilter);
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-16 text-stone-400 text-lg">No thots in this category yet. Explore others 🌱</div>`;
+        return;
+      }
+      grid.innerHTML = filtered.map(post => `
+        <div class="bg-white rounded-2xl overflow-hidden shadow-md card-hover border border-amber-100 flex flex-col h-full">
+          <img src="${post.image}" alt="${post.alt}" class="h-52 w-full object-cover">
+          <div class="p-5 flex flex-col flex-grow">
+            <span class="text-xs font-semibold uppercase tracking-wide text-amber-600 bg-amber-50 px-2 py-1 rounded-full w-fit">${post.tag}</span>
+            <h3 class="text-xl font-bold mt-3 text-stone-800">${escapeHtml(post.title)}</h3>
+            <p class="text-stone-500 text-sm mt-2 line-clamp-2">${escapeHtml(post.excerpt)}</p>
+            <div class="mt-4 flex justify-between items-center">
+              <button data-id="${post.id}" class="readMoreBtn bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium py-2 px-4 rounded-full text-sm transition"><i class="fas fa-book-open mr-1"></i> read thot</button>
+              <div class="text-xs text-stone-400"><i class="far fa-comment"></i> <span class="reviewCountSpan" data-id="${post.id}">${loadReviews(post.id).length}</span> reviews</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // attach read more events
+      document.querySelectorAll('.readMoreBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = parseInt(btn.getAttribute('data-id'));
+          openModalById(id);
+        });
+      });
+      // update review counts display on cards
+      blogPosts.forEach(p => {
+        const span = document.querySelector(`.reviewCountSpan[data-id="${p.id}"]`);
+        if (span) span.innerText = loadReviews(p.id).length;
+      });
+    }
+
+    // open modal and fill content + reviews + share
+    function openModalById(postId) {
+      const post = blogPosts.find(p => p.id === postId);
+      if (!post) return;
+      currentModalPostId = postId;
+      document.getElementById('modalTitle').innerText = post.title;
+      document.getElementById('modalFullContent').innerHTML = `<p class="text-lg">${escapeHtml(post.fullContent).replace(/\n/g, '</p><p class="mt-3">')}</p>`;
+      renderReviews(postId);
+      
+      // setup share links based on current post
+      const shareUrl = encodeURIComponent(window.location.href.split('#')[0] + `?post=${postId}`);
+      const shareText = encodeURIComponent(`"${post.title}" - RealWorld Thots`);
+      document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+      document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+      document.getElementById('shareLinkedin').href = `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${encodeURIComponent(post.title)}`;
+      
+      // copy link
+      const copyBtn = document.getElementById('copyLinkBtn');
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(window.location.href.split('#')[0] + `?post=${postId}`);
+        alert('🔗 Link copied to clipboard! Share with friends.');
+      };
+      
+      // reset review form stars & rating
+      currentRatingSelected = 0;
+      updateStarUI(0);
+      document.getElementById('reviewerName').value = '';
+      document.getElementById('reviewComment').value = '';
+      document.getElementById('selectedRatingVal').innerText = '0/5';
+      
+      // show modal
+      const modal = document.getElementById('blogModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Star rating logic inside modal
+    function updateStarUI(rating) {
+      const stars = document.querySelectorAll('#ratingStars .rating-star');
+      stars.forEach((star, idx) => {
+        if (idx < rating) star.className = "fas fa-star rating-star text-amber-400";
+        else star.className = "far fa-star rating-star text-amber-400";
+      });
+      document.getElementById('selectedRatingVal').innerText = `${rating}/5`;
+    }
+
+    function initRatingStars() {
+      const starsContainer = document.getElementById('ratingStars');
+      if (!starsContainer) return;
+      starsContainer.querySelectorAll('.rating-star').forEach(star => {
+        star.addEventListener('click', (e) => {
+          const rating = parseInt(star.getAttribute('data-rating'));
+          currentRatingSelected = rating;
+          updateStarUI(rating);
+        });
+      });
+    }
+
+    // submit review
+    document.getElementById('submitReviewBtn')?.addEventListener('click', () => {
+      if (!currentModalPostId) return;
+      let name = document.getElementById('reviewerName').value;
+      const comment = document.getElementById('reviewComment').value;
+      if (!comment.trim()) { alert("Please write a comment before posting."); return; }
+      if (currentRatingSelected === 0) { alert("Please select a rating (1-5 stars)"); return; }
+      if (!name.trim()) name = "RealReader";
+      addReview(currentModalPostId, name, currentRatingSelected, comment);
+      renderReviews(currentModalPostId);
+      // update card count dynamically
+      const countSpan = document.querySelector(`.reviewCountSpan[data-id="${currentModalPostId}"]`);
+      if (countSpan) countSpan.innerText = loadReviews(currentModalPostId).length;
+      document.getElementById('reviewComment').value = '';
+      document.getElementById('reviewerName').value = '';
+      currentRatingSelected = 0;
+      updateStarUI(0);
+    });
+
+    // close modal
+    document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+      document.getElementById('blogModal').classList.add('hidden');
+      document.getElementById('blogModal').classList.remove('flex');
+      document.body.style.overflow = 'auto';
+    });
+    window.addEventListener('click', (e) => {
+      const modal = document.getElementById('blogModal');
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+      }
+    });
+
+    // FILTER NAVBAR ACTIVE and working
+    function setActiveFilterBtn(filterValue) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-filter') === filterValue) {
+          btn.classList.add('active-filter');
+          btn.classList.remove('bg-amber-50', 'text-stone-700');
+        } else {
+          btn.classList.remove('active-filter');
+          btn.classList.add('bg-amber-50', 'text-stone-700');
+        }
+      });
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const filterVal = btn.getAttribute('data-filter');
+        activeFilter = filterVal;
+        setActiveFilterBtn(filterVal);
+        renderBlogs();
+        // smooth scroll to grid
+        document.getElementById('blogGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // initial rendering, default active 'all'
+    setActiveFilterBtn('all');
+    renderBlogs();
+    initRatingStars();
+    // update total review count init
+    let totalAll = blogPosts.reduce((acc, p) => acc + loadReviews(p.id).length, 0);
+    document.getElementById('totalCommentsCount').innerText = totalAll;
+    
+    // optional - handle url ?post=xxx direct open
+    const urlParams = new URLSearchParams(window.location.search);
+    const postParam = urlParams.get('post');
+    if (postParam) {
+      const pid = parseInt(postParam);
+      if (blogPosts.some(p => p.id === pid)) {
+        setTimeout(() => openModalById(pid), 200);
+      }
+    }
+  </script>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-amber-100 mt-20 py-10 text-center text-stone-500 text-sm">
+    <div class="max-w-7xl mx-auto px-5">
+      <div class="flex justify-center gap-6 text-amber-600 text-xl mb-4">
+        <i class="fab fa-twitter hover:scale-110 transition"></i>
+        <i class="fab fa-instagram hover:scale-110 transition"></i>
+        <i class="fab fa-substack hover:scale-110 transition"></i>
+        <i class="fas fa-envelope hover:scale-110 transition"></i>
+      </div>
+      <p>© 2026 RealWorld Thots — honest conversations, real reviews, no filter. 🌍</p>
+      <p class="text-xs mt-2">Made with ☕ for thoughtful minds • Photos by Unsplash</p>
+    </div>
+  </footer>
+
+  <!-- Deployment & GitHub Map: Complete guide -->
+  <!-- =========== FULL DEPLOYMENT MAP ========== 
+   1. SAVE THIS FILE AS index.html
+   2. INIT GIT & PUSH TO GITHUB:
+        git init
+        git add index.html
+        git commit -m "RealWorld Thots blog with comments & share"
+        git branch -M main
+        git remote add origin https://github.com/YOUR_USERNAME/realworld-thots.git
+        git push -u origin main
+   3. DEPLOY TO NETLIFY (FREE):
+        - Go to netlify.com, drag & drop the project folder OR connect GitHub repo.
+        - Select repo, branch main, build command: none (static), publish directory: . (root)
+        - Click Deploy → live in seconds.
+   4. ALTERNATIVE: VERCEL: `vercel --prod` after installing Vercel CLI.
+   5. Custom domain ready: add in Netlify settings.
+   =========== Everything works: navbar filters, comments, share, real photos ==========
+  -->
+</body>
+</html>
